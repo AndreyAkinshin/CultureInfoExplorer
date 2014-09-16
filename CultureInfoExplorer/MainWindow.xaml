@@ -1,0 +1,259 @@
+﻿<Window x:Class="CultureInfoExplorer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:CultureInfoExplorer"
+        xmlns:globalization="clr-namespace:System.Globalization;assembly=mscorlib"
+        Title="CultureInfoExplorer" 
+        Height="700" Width="1000" WindowStartupLocation="CenterScreen"
+        Icon="Resources/icon.ico">
+  <Window.DataContext>
+    <local:MainViewModel />
+  </Window.DataContext>
+  <Window.Resources>
+    <local:CultureInfoToDescriptionConverter x:Key="CultureToDescriptionConverter" />
+    <local:CultureInfoPropertyToDescriptionConverter x:Key="PropertyToDescriptionConverter" />
+    <local:CultureInfoPropertyToValuesConverter x:Key="PropertyToValuesConverter" />
+    <local:CultureInfoPropertyValueToCulturesConverter x:Key="PropertyValueToCulturesConverter" />
+    <local:PatternToValuesConverter x:Key="PatternToValuesConverter" />
+    <local:PatternValueToCulturesConverter x:Key="PatternValueToCulturesConverter" />
+
+    <Style TargetType="{x:Type Control}" x:Key="BaseStyle">
+      <Setter Property="FontFamily" Value="Courier New" />
+    </Style>
+    <Style TargetType="ListViewItem">
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    </Style>
+    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource BaseStyle}" />
+    <Style TargetType="{x:Type ListBox}" BasedOn="{StaticResource BaseStyle}" />
+    <Style TargetType="{x:Type ListView}" BasedOn="{StaticResource BaseStyle}" />    
+  </Window.Resources>
+  <Grid>
+    <TabControl x:Name="MainTabControl">
+      <TabItem Header="Cultures">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+
+          <ListBox
+            x:Name="MainCulturesListBox"
+            ItemsSource="{Binding Cultures}"
+            DisplayMemberPath="DisplayName"
+            SelectedItem="{Binding SelectedCulture}" />
+
+          <TextBox 
+            Grid.Column="1"
+            Text="{Binding SelectedCulture, Converter={StaticResource CultureToDescriptionConverter}}"
+            ScrollViewer.HorizontalScrollBarVisibility="Auto"
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            IsReadOnly="True" />
+
+          <GridSplitter 
+            Grid.Column="0" 
+            Grid.Row="0"
+            Width="5"
+            HorizontalAlignment="Right" 
+            VerticalAlignment="Stretch" />
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="Properties">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+
+          <ListBox 
+            ItemsSource="{Binding GroupedProperites}"
+            DisplayMemberPath="Name"
+            SelectedItem="{Binding SelectedProperty}">
+            <ListBox.GroupStyle>
+              <GroupStyle>
+                <GroupStyle.HeaderTemplate>
+                  <DataTemplate DataType="{x:Type GroupItem}">
+                    <TextBlock FontWeight="Bold" FontSize="14" Text="{Binding Name}"/>
+                  </DataTemplate>
+                </GroupStyle.HeaderTemplate>
+              </GroupStyle>
+
+            </ListBox.GroupStyle>
+          </ListBox>
+
+          <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="{Binding SelectedProperty.DisplayName}" FontWeight="Bold" />
+            <TextBlock Grid.Row="1" Text="{Binding SelectedProperty.Description}" />
+            <TextBlock Grid.Row="2">
+              <Hyperlink NavigateUri="{Binding SelectedProperty.MsdnUrl}" RequestNavigate="OnRequestNavigate">
+                <TextBlock Text="{Binding Path=SelectedProperty.MsdnUrl}"/>
+              </Hyperlink>
+            </TextBlock>
+
+            <TabControl Grid.Row="3" Margin="0,5,0,0">
+              <TabItem Header="Grouped">
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="250" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                  </Grid.RowDefinitions>
+
+                  <TextBlock Grid.Row="0" Grid.Column="0" Text="Values:" />
+                  <TextBlock Grid.Row="0" Grid.Column="1" Text="Cultures:" />
+
+                  <ListBox 
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    ItemsSource="{Binding SelectedProperty, Converter={StaticResource PropertyToValuesConverter}}"
+                    SelectedItem="{Binding SelectedPropertyValue}" />
+
+                  <ListView 
+                    Grid.Row="1" 
+                    Grid.Column="1" 
+                    SelectedItem="{Binding SelectedCulture}" 
+                    MouseDoubleClick="OnCulturesSecondListBoxMouseDoubleClick">
+                    <ListView.ItemsSource>
+                      <MultiBinding Converter="{StaticResource PropertyValueToCulturesConverter}">
+                        <Binding Path="SelectedProperty" />
+                        <Binding Path="SelectedPropertyValue" />
+                      </MultiBinding>
+                    </ListView.ItemsSource>
+                    <ListView.View>
+                      <GridView>
+                        <GridViewColumn Header="Name" Width="Auto">
+                          <GridViewColumn.CellTemplate>
+                            <DataTemplate DataType="{x:Type globalization:CultureInfo}">
+                              <TextBlock Text="{Binding Name}" Foreground="Black" />
+                            </DataTemplate>
+                          </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="EnglishName" Width="Auto">
+                          <GridViewColumn.CellTemplate>
+                            <DataTemplate DataType="{x:Type globalization:CultureInfo}">
+                              <TextBlock Text="{Binding EnglishName}" Foreground="Black" />
+                            </DataTemplate>
+                          </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                      </GridView>
+                    </ListView.View>
+                  </ListView>
+
+                  <GridSplitter 
+                    Grid.Column="0" 
+                    Grid.Row="1"
+                    Width="5"
+                    HorizontalAlignment="Right" 
+                    VerticalAlignment="Stretch" />
+                </Grid>
+              </TabItem>
+              <TabItem Header="Plain">
+                <TextBox             
+                  Text="{Binding SelectedProperty, Converter={StaticResource PropertyToDescriptionConverter}}"
+                  TextWrapping="Wrap"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  IsReadOnly="True" />
+              </TabItem>
+            </TabControl>
+          </Grid>
+
+          <GridSplitter 
+            Grid.Column="0" 
+            Grid.Row="0"
+            Width="5"
+            HorizontalAlignment="Right" 
+            VerticalAlignment="Stretch" />
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="Patterns">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="250" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
+
+          <TextBlock Grid.Row="0" Grid.Column="0" Text="Patterns" />
+          <TextBlock Grid.Row="0" Grid.Column="1" Text="Values:" />
+          <TextBlock Grid.Row="0" Grid.Column="2" Text="Cultures:" />
+
+          <ListBox
+            Grid.Row="1"
+            Grid.Column="0"
+            ItemsSource="{Binding Patterns}"
+            DisplayMemberPath="Name"
+            SelectedItem="{Binding SelectedPattern}" />
+
+          <ListBox
+            Grid.Row="1"
+            Grid.Column="1"
+            ItemsSource="{Binding SelectedPattern, Converter={StaticResource PatternToValuesConverter}}"
+            SelectedItem="{Binding SelectedPatternValue}" />
+
+          <ListView 
+            Grid.Row="1"
+            Grid.Column="2"
+            SelectedItem="{Binding SelectedCulture}" 
+            MouseDoubleClick="OnCulturesSecondListBoxMouseDoubleClick">
+            <ListView.ItemsSource>
+              <MultiBinding Converter="{StaticResource PatternValueToCulturesConverter}">
+                <Binding Path="SelectedPattern" />
+                <Binding Path="SelectedPatternValue" />
+              </MultiBinding>
+            </ListView.ItemsSource>
+            <ListView.View>
+              <GridView>
+                <GridViewColumn Header="Name" Width="Auto">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate DataType="{x:Type globalization:CultureInfo}">
+                      <TextBlock Text="{Binding Name}" Foreground="Black" />
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+                <GridViewColumn Header="EnglishName" Width="Auto">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate DataType="{x:Type globalization:CultureInfo}">
+                      <TextBlock Text="{Binding EnglishName}" Foreground="Black" />
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+              </GridView>
+            </ListView.View>
+          </ListView>
+
+          <GridSplitter 
+            Grid.Column="0" 
+            Grid.Row="1"
+            Width="5"
+            HorizontalAlignment="Right" 
+            VerticalAlignment="Stretch" />
+
+          <GridSplitter 
+            Grid.Column="1" 
+            Grid.Row="1"
+            Width="5"
+            HorizontalAlignment="Right" 
+            VerticalAlignment="Stretch" />
+        </Grid>
+      </TabItem>
+    </TabControl>
+  </Grid>
+</Window>
