@@ -19,19 +19,20 @@
     <local:CultureInfoPropertyValueToCulturesConverter x:Key="PropertyValueToCulturesConverter" />
     <local:PatternToValuesConverter x:Key="PatternToValuesConverter" />
     <local:PatternValueToCulturesConverter x:Key="PatternValueToCulturesConverter" />
-    <local:CultureCollectionFilterConverter x:Key="CultureCollectionFilterConverter" />
+    <local:CultureInfoCollectionFilterConverter x:Key="CultureCollectionFilterConverter" />
+    <local:CultureInfoPropertyCollectionFilterConverter x:Key="PropertyCollectionFilterConverter" />
 
     <Style TargetType="{x:Type Control}" x:Key="BaseStyle">
       <Setter Property="FontFamily" Value="Consolas" />
     </Style>
-    
+
     <Style TargetType="ListViewItem">
       <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     </Style>
-    
+
     <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource BaseStyle}" />
     <Style TargetType="{x:Type ListBox}" BasedOn="{StaticResource BaseStyle}" />
-    <Style TargetType="{x:Type ListView}" BasedOn="{StaticResource BaseStyle}" />    
+    <Style TargetType="{x:Type ListView}" BasedOn="{StaticResource BaseStyle}" />
   </Window.Resources>
   <Grid>
     <TabControl x:Name="MainTabControl">
@@ -45,8 +46,18 @@
             <ColumnDefinition Width="300" />
             <ColumnDefinition Width="*" />
           </Grid.ColumnDefinitions>
-          
-          <TextBox x:Name="CultureSearchQueryTextBox" />
+
+          <Border Margin="2">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+
+              <TextBlock Text="Filter:" Margin="0,0,3,0" />
+              <TextBox Grid.Column="1" x:Name="CultureSearchQueryTextBox" />
+            </Grid>
+          </Border>
 
           <ListBox
             Grid.Row="1"
@@ -59,19 +70,17 @@
             SelectedItem="{Binding SelectedCulture}" />
 
           <TextBox
-            Grid.Row="1"
+            Grid.Row="0"
+            Grid.RowSpan="2"
             Grid.Column="1"
             Text="{Binding SelectedCulture, Converter={StaticResource CultureToDescriptionConverter}}"
             ScrollViewer.HorizontalScrollBarVisibility="Auto"
             ScrollViewer.VerticalScrollBarVisibility="Auto"
             IsReadOnly="True" />
-          
-          <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
 
           <GridSplitter 
             Grid.Column="0" 
             Grid.Row="1"
-            ResizeDirection="Columns"
             Width="5"
             HorizontalAlignment="Right" 
             VerticalAlignment="Stretch" />
@@ -84,9 +93,29 @@
             <ColumnDefinition Width="300" />
             <ColumnDefinition Width="*" />
           </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
+
+          <Border Margin="2">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+
+              <TextBlock Text="Filter:" Margin="0,0,3,0" />
+              <TextBox Grid.Column="1" x:Name="PropertySearchQueryTextBox" />
+            </Grid>
+          </Border>
 
           <ListBox 
-            ItemsSource="{Binding GroupedProperites}"
+            Grid.Row="1"
+            Grid.Column="0"
+            ItemsSource="{Binding
+              ElementName=PropertySearchQueryTextBox, Path=Text, Mode=OneWay,
+              Converter={StaticResource PropertyCollectionFilterConverter}}"
             DisplayMemberPath="Name"
             SelectedItem="{Binding SelectedProperty}">
             <ListBox.GroupStyle>
@@ -97,11 +126,10 @@
                   </DataTemplate>
                 </GroupStyle.HeaderTemplate>
               </GroupStyle>
-
             </ListBox.GroupStyle>
           </ListBox>
 
-          <Grid Grid.Column="1">
+          <Grid Grid.Row="0" Grid.RowSpan="2" Grid.Column="1">
             <Grid.RowDefinitions>
               <RowDefinition Height="Auto" />
               <RowDefinition Height="*" />
@@ -190,7 +218,7 @@
 
           <GridSplitter 
             Grid.Column="0" 
-            Grid.Row="0"
+            Grid.Row="1"
             Width="5"
             HorizontalAlignment="Right" 
             VerticalAlignment="Stretch" />

@@ -5,20 +5,14 @@ using System.Windows.Data;
 
 namespace CultureInfoExplorer
 {
-    public sealed class CultureCollectionFilterConverter : IValueConverter
+    public sealed class CultureInfoCollectionFilterConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null) return ExploreHelper.AllCultures;
-
             var filter = value as string;
-            if (filter == null)
-                throw new ArgumentException("Value should be of System.String type.");
-
-            if (filter == string.Empty)
+            if (string.IsNullOrWhiteSpace(filter))
                 return ExploreHelper.AllCultures;
             filter = filter.ToUpperInvariant();
-
             return ExploreHelper.AllCultures.Where(c => c.EnglishName.ToUpperInvariant().Contains(filter));
         }
 

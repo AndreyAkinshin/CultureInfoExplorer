@@ -440,14 +440,15 @@ namespace CultureInfoExplorer
                     culture => culture.TextInfo.OEMCodePage.ToString(CultureInfo.InvariantCulture)),
             });
 
+            const double Number = 1234567.1234567;
             var patterns = new List<Pattern>
             {
-                new Pattern("Number (positive)", culture => string.Format(culture, "{0:N7}", 1234567.1234567)),
-                new Pattern("Number (negative)", culture => string.Format(culture, "{0:N7}", -1234567.1234567)),
-                new Pattern("Percent (positive)", culture => string.Format(culture, "{0:P7}", 1234567.1234567)),
-                new Pattern("Percent (negative)", culture => string.Format(culture, "{0:P7}", -1234567.1234567)),
-                new Pattern("Currency (positive)", culture => string.Format(culture, "{0:C7}", 1234567.1234567)),
-                new Pattern("Currency (negative)", culture => string.Format(culture, "{0:C7}", -1234567.1234567)),
+                new Pattern("Number (positive)", culture => string.Format(culture, "{0:N7}", Number)),
+                new Pattern("Number (negative)", culture => string.Format(culture, "{0:N7}", -Number)),
+                new Pattern("Percent (positive)", culture => string.Format(culture, "{0:P7}", Number)),
+                new Pattern("Percent (negative)", culture => string.Format(culture, "{0:P7}", -Number)),
+                new Pattern("Currency (positive)", culture => string.Format(culture, "{0:C7}", Number)),
+                new Pattern("Currency (negative)", culture => string.Format(culture, "{0:C7}", -Number)),
             };
             var dateTimeValue = new DateTime(2014, 12, 31, 13, 14, 15);
             var dateTimeFormats = new[]
