@@ -13,10 +13,10 @@ namespace CultureInfoExplorer
             IEnumerable<CultureInfoProperty> properties;
             var filter = value as string;
             if (string.IsNullOrWhiteSpace(filter))
-                properties = ExploreHelper.AllProperties;
+                properties = ExploreHelper.AllProperties.ToList();
             else
             {
-                filter = filter.ToUpperInvariant();
+                filter = filter.ToUpperInvariant().Trim();
                 properties = ExploreHelper.AllProperties.Where(c => c.DisplayName.ToUpperInvariant().Contains(filter));
             }
             var groupedProperites = CollectionViewSource.GetDefaultView(properties);

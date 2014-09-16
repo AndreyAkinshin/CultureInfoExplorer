@@ -12,7 +12,7 @@ namespace CultureInfoExplorer
             var filter = value as string;
             if (string.IsNullOrWhiteSpace(filter))
                 return ExploreHelper.AllCultures;
-            filter = filter.ToUpperInvariant();
+            filter = filter.ToUpperInvariant().Trim();
             return ExploreHelper.AllCultures.Where(c => c.EnglishName.ToUpperInvariant().Contains(filter));
         }
 
