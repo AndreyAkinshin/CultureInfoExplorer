@@ -19,6 +19,7 @@
     <local:CultureInfoPropertyValueToCulturesConverter x:Key="PropertyValueToCulturesConverter" />
     <local:PatternToValuesConverter x:Key="PatternToValuesConverter" />
     <local:PatternValueToCulturesConverter x:Key="PatternValueToCulturesConverter" />
+    <local:CultureCollectionFilterConverter x:Key="CultureCollectionFilterConverter" />
 
     <Style TargetType="{x:Type Control}" x:Key="BaseStyle">
       <Setter Property="FontFamily" Value="Consolas" />
@@ -36,27 +37,41 @@
     <TabControl x:Name="MainTabControl">
       <TabItem Header="Cultures">
         <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300" />
             <ColumnDefinition Width="*" />
           </Grid.ColumnDefinitions>
+          
+          <TextBox x:Name="CultureSearchQueryTextBox" />
 
           <ListBox
+            Grid.Row="1"
+            Grid.Column="0"
             x:Name="MainCulturesListBox"
-            ItemsSource="{Binding Cultures}"
+            ItemsSource="{Binding
+              ElementName=CultureSearchQueryTextBox, Path=Text, Mode=OneWay,
+              Converter={StaticResource CultureCollectionFilterConverter}}"
             DisplayMemberPath="DisplayName"
             SelectedItem="{Binding SelectedCulture}" />
 
-          <TextBox 
+          <TextBox
+            Grid.Row="1"
             Grid.Column="1"
             Text="{Binding SelectedCulture, Converter={StaticResource CultureToDescriptionConverter}}"
             ScrollViewer.HorizontalScrollBarVisibility="Auto"
             ScrollViewer.VerticalScrollBarVisibility="Auto"
             IsReadOnly="True" />
+          
+          <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
 
           <GridSplitter 
             Grid.Column="0" 
-            Grid.Row="0"
+            Grid.Row="1"
+            ResizeDirection="Columns"
             Width="5"
             HorizontalAlignment="Right" 
             VerticalAlignment="Stretch" />

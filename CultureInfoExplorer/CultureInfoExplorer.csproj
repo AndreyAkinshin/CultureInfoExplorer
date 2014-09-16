@@ -60,6 +60,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Converters\CultureCollectionFilterConverter.cs" />
     <Compile Include="Converters\CultureInfoPropertyToValuesConverter.cs" />
     <Compile Include="Converters\CultureInfoPropertyValueToCulturiesConverter.cs" />
     <Compile Include="Converters\PatternToValuesConverter.cs" />
