@@ -19,13 +19,16 @@
     <local:CultureInfoPropertyValueToCulturesConverter x:Key="PropertyValueToCulturesConverter" />
     <local:PatternToValuesConverter x:Key="PatternToValuesConverter" />
     <local:PatternValueToCulturesConverter x:Key="PatternValueToCulturesConverter" />
+    <local:CultureCollectionFilterConverter x:Key="CultureCollectionFilterConverter" />
 
     <Style TargetType="{x:Type Control}" x:Key="BaseStyle">
-      <Setter Property="FontFamily" Value="Courier New" />
+      <Setter Property="FontFamily" Value="Consolas" />
     </Style>
+    
     <Style TargetType="ListViewItem">
       <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     </Style>
+    
     <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource BaseStyle}" />
     <Style TargetType="{x:Type ListBox}" BasedOn="{StaticResource BaseStyle}" />
     <Style TargetType="{x:Type ListView}" BasedOn="{StaticResource BaseStyle}" />    
@@ -34,27 +37,41 @@
     <TabControl x:Name="MainTabControl">
       <TabItem Header="Cultures">
         <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300" />
             <ColumnDefinition Width="*" />
           </Grid.ColumnDefinitions>
+          
+          <TextBox x:Name="CultureSearchQueryTextBox" />
 
           <ListBox
+            Grid.Row="1"
+            Grid.Column="0"
             x:Name="MainCulturesListBox"
-            ItemsSource="{Binding Cultures}"
+            ItemsSource="{Binding
+              ElementName=CultureSearchQueryTextBox, Path=Text, Mode=OneWay,
+              Converter={StaticResource CultureCollectionFilterConverter}}"
             DisplayMemberPath="DisplayName"
             SelectedItem="{Binding SelectedCulture}" />
 
-          <TextBox 
+          <TextBox
+            Grid.Row="1"
             Grid.Column="1"
             Text="{Binding SelectedCulture, Converter={StaticResource CultureToDescriptionConverter}}"
             ScrollViewer.HorizontalScrollBarVisibility="Auto"
             ScrollViewer.VerticalScrollBarVisibility="Auto"
             IsReadOnly="True" />
+          
+          <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
 
           <GridSplitter 
             Grid.Column="0" 
-            Grid.Row="0"
+            Grid.Row="1"
+            ResizeDirection="Columns"
             Width="5"
             HorizontalAlignment="Right" 
             VerticalAlignment="Stretch" />
@@ -76,7 +93,7 @@
               <GroupStyle>
                 <GroupStyle.HeaderTemplate>
                   <DataTemplate DataType="{x:Type GroupItem}">
-                    <TextBlock FontWeight="Bold" FontSize="14" Text="{Binding Name}"/>
+                    <TextBlock FontWeight="SemiBold" FontSize="12" Text="{Binding Name}" Margin="2,0,0,0"/>
                   </DataTemplate>
                 </GroupStyle.HeaderTemplate>
               </GroupStyle>
@@ -87,20 +104,21 @@
           <Grid Grid.Column="1">
             <Grid.RowDefinitions>
               <RowDefinition Height="Auto" />
-              <RowDefinition Height="Auto" />
-              <RowDefinition Height="Auto" />
               <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Text="{Binding SelectedProperty.DisplayName}" FontWeight="Bold" />
-            <TextBlock Grid.Row="1" Text="{Binding SelectedProperty.Description}" />
-            <TextBlock Grid.Row="2">
+
+            <StackPanel Grid.Row="0" Margin="2,0,0,0">
+              <TextBlock Text="{Binding SelectedProperty.DisplayName}" FontWeight="SemiBold"/>
+              <TextBlock Text="{Binding SelectedProperty.Description}" />
+              <TextBlock>
               <Hyperlink NavigateUri="{Binding SelectedProperty.MsdnUrl}" RequestNavigate="OnRequestNavigate">
                 <TextBlock Text="{Binding Path=SelectedProperty.MsdnUrl}"/>
               </Hyperlink>
-            </TextBlock>
+              </TextBlock>
+            </StackPanel>
 
-            <TabControl Grid.Row="3" Margin="0,5,0,0">
+            <TabControl Grid.Row="1" Margin="0,5,0,0">
               <TabItem Header="Grouped">
                 <Grid>
                   <Grid.ColumnDefinitions>
