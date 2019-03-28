@@ -85,6 +85,12 @@ namespace CultureInfoExplorer
                     "The list of calendars that can be used by the culture.",
                     "http://msdn.microsoft.com/en-us/library/system.globalization.cultureinfo.optionalcalendars.aspx",
                     culture => ArrayToString(culture.OptionalCalendars.Select(CalendarToString).ToArray(), ", ")),
+                new CultureInfoProperty(
+                    "Main",
+                    "LCID",
+                    "The culture identifier",
+                    "https://msdn.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo.lcid",
+                    culture => culture.LCID.ToString()),
                 
                 // *** NumberFormat, Common ***
                 new CultureInfoProperty(
